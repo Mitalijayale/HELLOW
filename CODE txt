@@ -1262,45 +1262,38 @@ int main()
 
 ---------------------
 
-#include <stdio.h>
-#include <stdlib.h> 
-// An iterative binary search function.
-int binarySearch(int arr[], int l, int r, int x)
-{
-    while (l <= r) {
-        int m = l + (r - l) / 2;
- 
-        // Check if x is present at mid
-        if (arr[m] == x)
-            return m;
- 
-        // If x greater, ignore left half
-        if (arr[m] < x)
-            l = m + 1;
- 
-        // If x is smaller, ignore right half
-        else
-            r = m - 1;
-    }
- 
-    // If we reach here, then element was not present
-    return -1;
-}
- 
-// Driver code
-int main(void)
-{
-    int arr[] = { 2, 3, 4, 10, 40 };
-    int n = sizeof(arr) / sizeof(arr[0]);
-    int x = 10;
-    int result = binarySearch(arr, 0, n - 1, x);
-    (result == -1) ? printf("Element is not present"
-                            " in array")
-                   : printf("Element is present at "
-                            "index %d",
-                            result);
-    return 0;
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/shm.h>
+#include <string.h>
+int main() 
+{
+	int i;
+	void *shared_memory;
+	char buff[100];
+	int shmid;
+	// Create or get the shared memory segment
+	shmid = shmget((key_t)2345, 1024, 0666 | IPC_CREAT);
+	printf("Key of shared memory is %d\n", shmid);
+	
+	// Attach to the shared memory segment
+	shared_memory = shmat(shmid, NULL, 0);
+	printf("Process attached at %p\n", shared_memory);
+	
+	// Write data to shared memory
+	printf("Enter some data to write to shared memory: ");
+	fgets(buff, sizeof(buff), stdin); // Get some input from the user
+	strcpy(shared_memory, buff, 100); // Data written to shared memory
+	// Detach from shared memory
+	shmdt(shared_memory);
+	return 0;
+}
+
+// gcc server.c -o server
+// gcc clint.c -o clint
+// ./server
 ======================================================================================================
 
 ASSIGNMENT 8
